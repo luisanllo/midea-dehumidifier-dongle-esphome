@@ -1,6 +1,6 @@
 # ESPHome on the stock Midea dehumidifier Wi-Fi dongle
 
-Run **ESPHome directly on the original Midea Wi-Fi dongle** and control your Midea dehumidifier **100 % locally** from Home Assistant — no Midea cloud, no app account, and **no ESP8266, no ESP32, no level shifter, no USB-A adapter**. The original dongle stays in its original port; only its firmware changes.
+Run **ESPHome directly on the original Midea Wi-Fi dongle** and control your Midea dehumidifier **100 % locally** from Home Assistant — no Midea cloud, no app account, and **no ESP8266, no ESP32, no level shifter, no USB-A adapter**. The original dongle goes back in its original place; only its firmware changes.
 
 <p align="center">
   <img src="images/architecture.svg" alt="Dehumidifier MCU ↔ stock dongle running ESPHome ↔ Home Assistant, no cloud" width="900">
@@ -50,12 +50,27 @@ Other Midea / Inventor / Comfee dehumidifiers with the same `MD_RTL8720` USB don
 
 ## What you need
 
-- The dehumidifier's own Wi-Fi dongle (pull it out of the USB-A port on the appliance — unplug the appliance first).
+- The dehumidifier's own Wi-Fi dongle (see [Getting to the dongle](#0-getting-to-the-dongle)) and a Phillips screwdriver.
 - A **3.3 V USB-serial adapter** (e.g. an FT232RL board with a 3.3 V / 5 V jumper). It is only needed **once**, for the first flash, and is removed afterwards.
 - Five thin wires and a soldering iron (the pads are small but well spaced; temporary wires are fine).
 - A computer with **Chrome or Edge** (the flasher uses Web Serial) and ESPHome (the Home Assistant ESPHome add-on / Device Builder, or the ESPHome CLI).
 
 ---
+
+## 0. Getting to the dongle
+
+On this model the dongle is **inside the dehumidifier**, plugged into an internal USB-A extension cable that comes from the main board. There is no external USB port.
+
+1. **Unplug the dehumidifier from the mains** and remove the water tank.
+2. Remove **6 screws**: **4 at the back**, behind the filter cover, and **2 at the front**, behind the water tank.
+3. Lift the cover off. The dongle sits at the top, next to the evaporator coil; unplug it from the internal USB cable.
+
+<p align="center">
+  <img src="images/appliance-open.jpg" alt="Dehumidifier with the cover removed; the dongle is at the top next to the coil" width="420">
+  &nbsp;
+  <img src="images/dongle-inside.jpg" alt="The dongle on the internal USB-A extension cable (here still with the flashing wires soldered on)" width="420">
+</p>
+<p align="center"><sub>Left: cover removed — the dongle is at the top, next to the coil. Right: the dongle on the internal USB-A extension cable, here still with the flashing wires soldered on.</sub></p>
 
 ## 1. Find the pads
 
@@ -89,6 +104,11 @@ All the pads you need are on the **bottom side** of the dongle and are labelled 
 2. Connect: adapter **5V** (the free pin of the jumper header) → `5V`, **GND** → `GND`, **TX** → `LOG_RX`, **RX** → `LOG_TX`, **VCC (3.3 V)** → `CLK`.
 3. Plug the adapter into the computer. The dongle powers up with `CLK` high and starts in **download mode**.
 
+<p align="center">
+  <img src="images/dongle-soldered.jpg" alt="Real flashing wires soldered to the dongle: 5V (red), GND (brown), LOG_RX and LOG_TX (yellow and orange)" width="560">
+</p>
+<p align="center"><sub>The wiring actually used: 5V (red), GND (brown), LOG_RX and LOG_TX (yellow and orange). The CLK wire goes to the far end of the board, out of frame.</sub></p>
+
 > [!IMPORTANT]
 > Power the dongle from the adapter, **not by plugging the dongle into a PC USB port**. A PC pulls the USB data lines low — on this board that pulls the chip's A13 pin low and it will not boot reliably. To power-cycle, simply unplug and replug the adapter.
 
@@ -107,8 +127,8 @@ The flasher links to the chip's ROM downloader, writes the **partition table, th
 ## 5. Back into the dehumidifier
 
 1. Remove the `CLK` wire (otherwise the chip keeps booting into download mode) and all the other wires.
-2. With the dehumidifier **switched on**, plug the dongle back into its USB-A port.
-3. The dongle joins your Wi-Fi and Home Assistant should discover it as a new ESPHome device (enter the API encryption key from your secrets). From now on, **updates are done over Wi-Fi** like any other ESPHome device.
+2. Plug the dongle back into the internal USB cable, put the cover back and tighten the 6 screws.
+3. Plug the dehumidifier in and switch it on. The dongle joins your Wi-Fi and Home Assistant should discover it as a new ESPHome device (enter the API encryption key from your secrets). From now on, **updates are done over Wi-Fi** like any other ESPHome device.
 
 ---
 
