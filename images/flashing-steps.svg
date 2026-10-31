@@ -49,7 +49,7 @@
     <circle cx="894" cy="105" r="20" fill="#0ea5e9"/><text x="894" y="111" fill="#fff" font-weight="700" font-size="17">5</text>
     <text x="894" y="150" font-weight="700" fill="#0f172a">Plug it back</text>
     <text x="894" y="176" fill="#475569">into the running</text>
-    <text x="894" y="196" fill="#475569">dehumidifier. Next</text>
-    <text x="894" y="216" fill="#475569">updates go over Wi-Fi</text>
+    <text x="894" y="196" fill="#475569">dehumidifier; then</text>
+    <text x="894" y="216" fill="#475569">update over Wi-Fi</text>
   </g>
 </svg>
