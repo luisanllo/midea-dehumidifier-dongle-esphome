@@ -3,7 +3,7 @@
 # Tested on: Midea MDDFR-20DEN7-QA3-W, dongle board MD_RTL8720_V1.2 (Realtek RTL8720CF, ROM v3.0).
 # Dehumidifier component: https://github.com/Chreece/ESPHome-Dehumidifier (ESPHome port of Hypfer's firmware).
 #
-# First flash: see README.md (web.esphome.io/?rtl). After that, updates work over Wi-Fi (OTA).
+# First flash: see README.md (ESPHome → Install → Plug into this computer). After that, updates work over Wi-Fi (OTA).
 
 substitutions:
   name: midea-dehumidifier

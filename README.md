@@ -20,7 +20,7 @@ This builds entirely on the work of others:
 - **[Chreece/ESPHome-Dehumidifier](https://github.com/Chreece/ESPHome-Dehumidifier)** — the ESPHome component that speaks the Midea dehumidifier protocol (`midea_dehum`). All the dehumidifier logic is theirs.
 - **[Hypfer/esp8266-midea-dehumidifier](https://github.com/Hypfer/esp8266-midea-dehumidifier)** — the original cloud-free firmware and protocol reverse engineering that the component is based on.
 - **[sammothxc/midea-sk105-esphome](https://github.com/sammothxc/midea-sk105-esphome)** — showed that this same Midea board (used in their air conditioners) can run ESPHome, and where the download-mode pin is.
-- **[LibreTiny](https://github.com/libretiny-eu/libretiny)** and **[ESPHome](https://esphome.io)**, including the [web flasher](https://web.esphome.io/?rtl) with Realtek RTL8720C support.
+- **[LibreTiny](https://github.com/libretiny-eu/libretiny)** and **[ESPHome](https://esphome.io)**, including its browser flashing with Realtek RTL8720C support.
 
 What this repository adds: the procedure for the **dehumidifier's** stock dongle, a working configuration, and the fixes needed to make it reliable (see [Notes](#notes)).
 
@@ -53,7 +53,7 @@ Other Midea / Inventor / Comfee dehumidifiers with the same `MD_RTL8720` USB don
 - The dehumidifier's own Wi-Fi dongle (see [Getting to the dongle](#0-getting-to-the-dongle)) and a Phillips screwdriver.
 - A **3.3 V USB-serial adapter** (e.g. an FT232RL board with a 3.3 V / 5 V jumper). It is only needed **once**, for the first flash, and is removed afterwards.
 - Five thin wires and a soldering iron (the pads are small but well spaced; temporary wires are fine).
-- A computer with **Chrome or Edge** (the flasher uses Web Serial) and ESPHome (the Home Assistant ESPHome add-on / Device Builder, or the ESPHome CLI).
+- A computer with **Chrome or Edge** (flashing uses Web Serial) and ESPHome (the Home Assistant ESPHome add-on / Device Builder, or the ESPHome CLI).
 
 ---
 
@@ -89,10 +89,9 @@ All the pads you need are on the **bottom side** of the dongle and are labelled 
 | `CLK` | Chip pin **A0**: held at **3.3 V during power-up** it starts the ROM **download mode** |
 | `UART_RX_A13`, `UART_TX_A14`, `UART_*_5V0` | Link to the dehumidifier — leave them alone |
 
-## 2. Build the firmware
+## 2. Add the configuration to ESPHome
 
-1. Copy [`esphome/midea-dehumidifier.yaml`](esphome/midea-dehumidifier.yaml) into your ESPHome configuration and add the secrets from [`esphome/secrets.example.yaml`](esphome/secrets.example.yaml).
-2. Compile it and download the firmware **`.uf2`** file (in the ESPHome dashboard: *Install → Manual download*; with the CLI: `esphome compile midea-dehumidifier.yaml`, the file ends up in `.esphome/build/<name>/.pioenvs/<name>/firmware.uf2`).
+Copy [`esphome/midea-dehumidifier.yaml`](esphome/midea-dehumidifier.yaml) into your ESPHome configuration and add the secrets from [`esphome/secrets.example.yaml`](esphome/secrets.example.yaml).
 
 ## 3. Wire it and enter download mode
 
@@ -112,17 +111,19 @@ All the pads you need are on the **bottom side** of the dongle and are labelled 
 > [!IMPORTANT]
 > Power the dongle from the adapter, **not by plugging the dongle into a PC USB port**. A PC pulls the USB data lines low — on this board that pulls the chip's A13 pin low and it will not boot reliably. To power-cycle, simply unplug and replug the adapter.
 
-## 4. Flash with the ESPHome web flasher
+## 4. Flash it from ESPHome
 
 <p align="center">
-  <img src="images/flashing-steps.svg" alt="Build → download mode → flash at web.esphome.io → unwire → plug back" width="900">
+  <img src="images/flashing-steps.svg" alt="Configure → download mode → flash from ESPHome → unwire → plug back" width="900">
 </p>
 
-1. Open **[web.esphome.io/?rtl](https://web.esphome.io/?rtl)** in Chrome or Edge.
-2. *Connect* and choose the adapter's serial port.
-3. Choose the `.uf2` from step 2 and install it.
+Flash it straight from your own ESPHome, like any other new device:
 
-The flasher links to the chip's ROM downloader, writes the **partition table, the bootloader and the application**, and verifies each part — every write should end with `Verified … (SHA-256 matches)`. It worked on the first try.
+1. In the ESPHome dashboard, open the device and choose **Install → Plug into this computer** (Chrome or Edge).
+2. Choose the adapter's serial port.
+3. ESPHome compiles the firmware and writes the **partition table, the bootloader and the application**, verifying each part (`Verified … (SHA-256 matches)`).
+
+Alternatively, download the firmware with *Install → Manual download* and flash it at [web.esphome.io/?rtl](https://web.esphome.io/?rtl).
 
 ## 5. Back into the dehumidifier
 
@@ -164,13 +165,13 @@ The four modes were matched one by one against the LEDs on the control panel:
 - **LibreTiny 1.14.0 or newer.** With older versions the RTL8720CF can hang on a software reboot ([libretiny#396](https://github.com/libretiny-eu/libretiny/issues/396), fixed in [#397](https://github.com/libretiny-eu/libretiny/pull/397)), so the dongle would not come back after an OTA update until it was unplugged. The YAML pins the framework version.
 - **Handshake watchdog.** After a power cut the dongle and the appliance start at the same time. If the dongle greets the appliance before its main board is ready, the component's handshake is lost and it never polls again, so Home Assistant keeps showing *off*. The `interval:` block in the YAML retries the handshake and, after about 40 seconds, polls the status anyway — this model answers status queries even when the handshake never completes.
 - **`hvac_action` flickers** between *idle* and *drying* on each update while the appliance is running. It is cosmetic: the on/off state, mode, humidity and fan are correct.
-- **Board variant.** `generic-rtl8720cf-2mb-896k` puts the application at `0x10000`, like the stock firmware. The web flasher writes its own partition table and bootloader, so other RTL8720CF variants should work too; this is the one that was tested.
+- **Board variant.** `generic-rtl8720cf-2mb-896k` puts the application at `0x10000`, like the stock firmware. The first flash writes its own partition table and bootloader, so other RTL8720CF variants should work too; this is the one that was tested.
 
 ## Troubleshooting
 
 | Symptom | Fix |
 |---|---|
-| The flasher cannot connect | Check that `CLK` is at 3.3 V **before** the adapter is plugged in, and that TX/RX are crossed (adapter TX → `LOG_RX`). Unplug and replug the adapter. |
+| ESPHome cannot connect to the dongle | Check that `CLK` is at 3.3 V **before** the adapter is plugged in, and that TX/RX are crossed (adapter TX → `LOG_RX`). Unplug and replug the adapter. |
 | The dongle boot-loops or behaves randomly while flashing | It is being powered from a PC USB port. Power it from the adapter's 5 V instead. |
 | After flashing, nothing happens | `CLK` is still at 3.3 V: remove that wire and power-cycle. |
 | Home Assistant shows *off* while the appliance runs | Wait about 40 s after the dongle boots (handshake watchdog). Check the logs for `Handshake not complete; retry`. |
