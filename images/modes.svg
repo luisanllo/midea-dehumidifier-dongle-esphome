@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
+  <rect width="1000" height="400" rx="18" fill="#f8fafc"/>
+  <text x="500" y="40" text-anchor="middle" font-size="22" font-weight="700" fill="#0f172a">Operating modes (verified on the MDDFR-20DEN7-QA3-W panel)</text>
+
+  <!-- header -->
+  <g font-size="14" font-weight="700" fill="#475569">
+    <text x="60" y="86">Panel LEDs <tspan font-weight="400" font-size="12">(Dryer · Cont. · SMD)</tspan></text>
+    <text x="330" y="86">Protocol mode</text>
+    <text x="520" y="86">ESPHome preset</text>
+    <text x="740" y="86">Behaviour</text>
+  </g>
+  <line x1="40" y1="100" x2="960" y2="100" stroke="#cbd5e1" stroke-width="2"/>
+
+  <g font-size="15" fill="#0f172a">
+    <!-- row 1 -->
+    <rect x="40" y="110" width="920" height="60" rx="10" fill="#ffffff"/>
+    <g transform="translate(60,140)">
+      <circle cx="10" cy="0" r="7" fill="#1f2937"/><circle cx="40" cy="0" r="7" fill="#1f2937"/><circle cx="70" cy="0" r="7" fill="#1f2937"/>
+      <text x="92" y="5" fill="#475569" font-size="13">all off</text>
+    </g>
+    <text x="330" y="145" font-family="ui-monospace,Consolas,monospace">1</text>
+    <text x="520" y="145" font-weight="700">Target humidity</text>
+    <text x="740" y="137" font-size="13" fill="#475569">Dries down to the set point</text>
+    <text x="740" y="155" font-size="13" fill="#475569">(− / + on the panel, 30–80 %)</text>
+
+    <!-- row 2 -->
+    <rect x="40" y="180" width="920" height="60" rx="10" fill="#ffffff"/>
+    <g transform="translate(60,210)">
+      <circle cx="10" cy="0" r="7" fill="#1f2937"/><circle cx="40" cy="0" r="7" fill="#4ade80"/><circle cx="70" cy="0" r="7" fill="#1f2937"/>
+      <text x="92" y="5" fill="#475569" font-size="13">Cont.</text>
+    </g>
+    <text x="330" y="215" font-family="ui-monospace,Consolas,monospace">2</text>
+    <text x="520" y="215" font-weight="700">Continuous</text>
+    <text x="740" y="215" font-size="13" fill="#475569">Runs non-stop</text>
+
+    <!-- row 3 -->
+    <rect x="40" y="250" width="920" height="60" rx="10" fill="#ffffff"/>
+    <g transform="translate(60,280)">
+      <circle cx="10" cy="0" r="7" fill="#1f2937"/><circle cx="40" cy="0" r="7" fill="#1f2937"/><circle cx="70" cy="0" r="7" fill="#4ade80"/>
+      <text x="92" y="5" fill="#475569" font-size="13">SMD</text>
+    </g>
+    <text x="330" y="285" font-family="ui-monospace,Consolas,monospace">3</text>
+    <text x="520" y="285" font-weight="700">Smart</text>
+    <text x="740" y="285" font-size="13" fill="#475569">Automatic humidity control</text>
+
+    <!-- row 4 -->
+    <rect x="40" y="320" width="920" height="60" rx="10" fill="#ffffff"/>
+    <g transform="translate(60,350)">
+      <circle cx="10" cy="0" r="7" fill="#4ade80"/><circle cx="40" cy="0" r="7" fill="#1f2937"/><circle cx="70" cy="0" r="7" fill="#1f2937"/>
+      <text x="92" y="5" fill="#475569" font-size="13">Dryer</text>
+    </g>
+    <text x="330" y="355" font-family="ui-monospace,Consolas,monospace">4</text>
+    <text x="520" y="355" font-weight="700">Clothes drying</text>
+    <text x="740" y="355" font-size="13" fill="#475569">Fan forced to high</text>
+  </g>
+</svg>

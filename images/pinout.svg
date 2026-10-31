@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
+  <defs>
+    <linearGradient id="pcb" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1f8a46"/><stop offset="1" stop-color="#166b36"/>
+    </linearGradient>
+    <linearGradient id="usb" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e2e8f0"/><stop offset="1" stop-color="#94a3b8"/>
+    </linearGradient>
+  </defs>
+  <rect width="1000" height="560" rx="18" fill="#f8fafc"/>
+  <text x="500" y="40" text-anchor="middle" font-size="22" font-weight="700" fill="#0f172a">Dongle pads — bottom side (board MD_RTL8720_V1.2)</text>
+  <text x="500" y="66" text-anchor="middle" font-size="14" fill="#475569">Simplified drawing — the labels match the silkscreen on the real board. Only the five coloured pads are needed.</text>
+
+  <!-- USB plug -->
+  <rect x="70" y="190" width="150" height="170" rx="6" fill="url(#usb)" stroke="#64748b" stroke-width="2"/>
+  <rect x="105" y="222" width="32" height="26" rx="3" fill="#475569"/>
+  <rect x="105" y="302" width="32" height="26" rx="3" fill="#475569"/>
+  <text x="145" y="385" text-anchor="middle" font-size="13" fill="#475569">USB-A plug</text>
+  <text x="145" y="402" text-anchor="middle" font-size="12" fill="#64748b">(to the dehumidifier)</text>
+
+  <!-- PCB -->
+  <rect x="215" y="150" width="600" height="250" rx="10" fill="url(#pcb)" stroke="#0f5a2b" stroke-width="2"/>
+  <rect x="815" y="150" width="110" height="250" rx="10" fill="#1d7a40" stroke="#0f5a2b" stroke-width="2"/>
+  <text x="870" y="282" text-anchor="middle" font-size="13" fill="#bbf7d0" transform="rotate(-90 870 278)">antenna</text>
+  <!-- castellations -->
+  <g fill="#fbbf24" opacity="0.85">
+    <rect x="236" y="146" width="560" height="6"/><rect x="236" y="398" width="560" height="6"/>
+  </g>
+
+  <!-- USB-side pad column (5V, UART_RX_5V0, UART_TX_5V0, GND) -->
+  <g font-size="13" fill="#ecfdf5">
+    <circle cx="258" cy="190" r="11" fill="#ef4444" stroke="#fff" stroke-width="3"/>
+    <text x="276" y="195" font-weight="700">5V</text>
+    <circle cx="258" cy="226" r="9" fill="#d4d4d8"/>
+    <text x="276" y="231">UART_RX_5V0</text>
+    <circle cx="258" cy="260" r="9" fill="#d4d4d8"/>
+    <text x="276" y="265">UART_TX_5V0</text>
+    <circle cx="258" cy="294" r="11" fill="#111827" stroke="#fff" stroke-width="3"/>
+    <text x="276" y="299" font-weight="700">GND</text>
+  </g>
+
+  <!-- Edge pads along the long side -->
+  <g font-size="13" fill="#ecfdf5" text-anchor="middle">
+    <circle cx="420" cy="362" r="11" fill="#22c55e" stroke="#fff" stroke-width="3"/>
+    <text x="420" y="338" font-weight="700">LOG_RX</text>
+    <circle cx="480" cy="362" r="11" fill="#3b82f6" stroke="#fff" stroke-width="3"/>
+    <text x="480" y="320" font-weight="700">LOG_TX</text>
+    <circle cx="570" cy="362" r="9" fill="#d4d4d8"/>
+    <text x="570" y="338">UART_RX_A13</text>
+    <circle cx="630" cy="362" r="9" fill="#d4d4d8"/>
+    <text x="630" y="320">UART_TX_A14</text>
+    <circle cx="700" cy="362" r="9" fill="#d4d4d8"/>
+    <text x="700" y="338">GND</text>
+    <circle cx="770" cy="362" r="11" fill="#f59e0b" stroke="#fff" stroke-width="3"/>
+    <text x="770" y="338" font-weight="700">CLK</text>
+    <circle cx="770" cy="300" r="9" fill="#d4d4d8"/>
+    <text x="770" y="280">GND</text>
+  </g>
+  <text x="560" y="210" text-anchor="middle" font-size="12" fill="#bbf7d0">MD-WIFI(RTL8720).JD.TY.MWL.TP1</text>
+
+  <!-- Legend -->
+  <g font-size="14" fill="#0f172a">
+    <circle cx="90" cy="460" r="9" fill="#ef4444"/><text x="106" y="465"><tspan font-weight="700">5V</tspan> — power in (from the adapter's 5 V)</text>
+    <circle cx="90" cy="490" r="9" fill="#111827"/><text x="106" y="495"><tspan font-weight="700">GND</tspan> — common ground</text>
+    <circle cx="90" cy="520" r="9" fill="#f59e0b"/><text x="106" y="525"><tspan font-weight="700">CLK</tspan> = GPIO A0 — boot strap: 3.3 V at power-up ⇒ download mode</text>
+    <circle cx="560" cy="460" r="9" fill="#3b82f6"/><text x="576" y="465"><tspan font-weight="700">LOG_TX</tspan> — chip TX (UART2) → adapter RX</text>
+    <circle cx="560" cy="490" r="9" fill="#22c55e"/><text x="576" y="495"><tspan font-weight="700">LOG_RX</tspan> — chip RX (UART2) ← adapter TX</text>
+    <circle cx="560" cy="520" r="9" fill="#d4d4d8"/><text x="576" y="525">Grey: link to the dehumidifier — leave unconnected</text>
+  </g>
+</svg>

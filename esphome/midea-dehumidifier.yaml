@@ -1,0 +1,158 @@
+# ESPHome on the STOCK Midea Wi-Fi dongle of a Midea dehumidifier (no ESP8266/ESP32, no extra hardware).
+#
+# Tested on: Midea MDDFR-20DEN7-QA3-W, dongle board MD_RTL8720_V1.2 (Realtek RTL8720CF, ROM v3.0).
+# Dehumidifier component: https://github.com/Chreece/ESPHome-Dehumidifier (ESPHome port of Hypfer's firmware).
+#
+# First flash: see README.md (web.esphome.io/?rtl). After that, updates work over Wi-Fi (OTA).
+
+substitutions:
+  name: midea-dehumidifier
+  friendly_name: Dehumidifier
+
+esphome:
+  name: ${name}
+  friendly_name: ${friendly_name}
+  platformio_options:
+    build_flags:
+      # The dongle talks to the dehumidifier on PA13 (RX) / PA14 (TX); the board already level-shifts to 5 V.
+      - -DPIN_SERIAL0_RX=13u
+      - -DPIN_SERIAL0_TX=14u
+
+rtl87xx:
+  # Same layout as the stock Midea firmware (application at 0x10000).
+  board: generic-rtl8720cf-2mb-896k
+  framework:
+    # LibreTiny 1.14.0 or newer is required: older versions can hang the RTL8720CF on a software reboot
+    # (libretiny#396/#397), so the dongle would not come back after an OTA update until it was unplugged.
+    version: 1.14.0
+
+logger:
+
+api:
+  encryption:
+    key: !secret dehumidifier_api_key
+
+ota:
+  - platform: esphome
+    password: !secret dehumidifier_ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  # Optional fixed address:
+  # manual_ip:
+  #   static_ip: 192.168.1.50
+  #   gateway: 192.168.1.1
+  #   subnet: 255.255.255.0
+  ap:
+    ssid: Dehumidifier Fallback
+    password: !secret dehumidifier_ap_password
+
+captive_portal:
+
+web_server:
+  port: 80
+  version: 3
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/Chreece/ESPHome-Dehumidifier
+      # Pinned to the commit this was tested with.
+      ref: 0e46ee10096ee58213e4e37cc058a3912af9cd99
+    components: [midea_dehum]
+    refresh: 0min
+
+uart:
+  id: uart_midea
+  tx_pin: PA14
+  rx_pin: PA13
+  baud_rate: 9600
+
+midea_dehum:
+  id: midea_dehum_comp
+  uart_id: uart_midea
+  status_poll_interval: 2000
+  # This model answers with protocol v1 (auto-detected once with protocol_version: 0).
+  protocol_version: 1
+  # Mode names as verified on the control panel: 1 = no LED, 2 = "Cont.", 3 = "SMD", 4 = "Dryer".
+  display_mode_setpoint: 'Target humidity'
+  display_mode_continuous: 'Continuous'
+  display_mode_smart: 'Smart'
+  display_mode_clothes_drying: 'Clothes drying'
+
+# Handshake watchdog.
+# After a power cut the dongle and the dehumidifier boot at the same time. If the dongle greets the appliance
+# before its main board is ready, the handshake is lost and the component never polls again, so Home Assistant
+# keeps showing "off". Every 10 s, while the handshake is not complete: if the appliance has not answered the
+# announce yet, start over; if it already answered (step >= 2), wait for it to finish. After ~40 s, poll the
+# status anyway: this model answers status queries even when the handshake never completes.
+globals:
+  - id: handshake_retries
+    type: int
+    initial_value: '0'
+
+interval:
+  - interval: 10s
+    startup_delay: 15s
+    then:
+      - lambda: |-
+          auto *c = id(midea_dehum_comp);
+          if (c->get_handshake_done()) {
+            id(handshake_retries) = 0;
+            return;
+          }
+          id(handshake_retries)++;
+          if (id(handshake_retries) < 4 && c->get_handshake_step() >= 2) {
+            ESP_LOGI("dehumidifier", "Appliance answered the handshake; waiting for it to finish (%d)", id(handshake_retries));
+          } else if (id(handshake_retries) < 4) {
+            ESP_LOGW("dehumidifier", "Handshake not complete; retry %d", id(handshake_retries));
+            c->set_handshake_step(0);
+            c->performHandshakeStep();
+          } else {
+            ESP_LOGW("dehumidifier", "No complete handshake after ~40 s: polling the status anyway");
+            c->set_handshake_done(true);
+            c->getStatus();
+          }
+
+climate:
+  - platform: midea_dehum
+    midea_dehum_id: midea_dehum_comp
+    name: "Dehumidifier"
+
+binary_sensor:
+  - platform: midea_dehum
+    midea_dehum_id: midea_dehum_comp
+    bucket_full:
+      name: "Tank full"
+    defrost:
+      name: "Defrosting"
+
+sensor:
+  - platform: midea_dehum
+    midea_dehum_id: midea_dehum_comp
+    error:
+      name: "Error code"
+    humidity:
+      name: "Humidity"
+    temperature:
+      name: "Temperature"
+
+switch:
+  - platform: midea_dehum
+    midea_dehum_id: midea_dehum_comp
+    # No ionizer: this model only reports fan speed (0x10), auto humidity (0x1F) and clothes drying (0x20).
+    beep:
+      name: "Beep on commands"
+
+number:
+  - platform: midea_dehum
+    midea_dehum_id: midea_dehum_comp
+    timer:
+      name: "Timer"
+
+text_sensor:
+  - platform: midea_dehum
+    midea_dehum_id: midea_dehum_comp
+    capabilities:
+      name: "Capabilities"
