@@ -66,9 +66,9 @@ On this model the dongle is **inside the dehumidifier**, plugged into an interna
 3. Lift the cover off. The dongle sits at the top, next to the evaporator coil; unplug it from the internal USB cable.
 
 <p align="center">
-  <img src="images/appliance-open.jpg" alt="Dehumidifier with the cover removed; the dongle is at the top next to the coil" width="420">
+  <img src="images/appliance-open.jpg" alt="Dehumidifier with the cover removed; the dongle is at the top next to the coil" width="380">
   &nbsp;
-  <img src="images/dongle-inside.jpg" alt="The dongle on the internal USB-A extension cable (here still with the flashing wires soldered on)" width="420">
+  <img src="images/dongle-inside.jpg" alt="The dongle on the internal USB-A extension cable (here still with the flashing wires soldered on)" width="380">
 </p>
 <p align="center"><sub>Left: cover removed — the dongle is at the top, next to the coil. Right: the dongle on the internal USB-A extension cable, here still with the flashing wires soldered on.</sub></p>
 
